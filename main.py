@@ -1,5 +1,5 @@
 # Autores: FABIO KAUÊ ARAUJO DA SILVA, N° USP: 16311045
-#          PEDRO ANHIEVISK, N° USP: 00000000
+#          PEDRO ANHIEVISK, N° USP: 15656521 
 
 import math
 from bissecao import bissecao_tabela
