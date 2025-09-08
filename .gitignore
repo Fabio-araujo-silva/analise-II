@@ -1,0 +1,12 @@
+*
+!.gitattributes
+!.gitignore
+!readme.md
+!.gitkeep
+!*.pdf
+!*.tex
+!*.c
+!*.py
+!*.png
+!*.jpeg
+!*/

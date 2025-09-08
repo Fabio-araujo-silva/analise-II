@@ -1,71 +1,46 @@
-import csv
-from math import inf
+# Autores: Nome Completo do Autor 1, N° USP: 00000000
+#          Nome Completo do Autor 2, N° USP: 00000000
+#          Nome Completo do Autor 3, N° USP: 00000000
 
-# Versão 2: Gera uma tabela com o passo a passo de cada iteração
-def secantes_tabela(f, x0, x1, true_root, output_filename="secantes_passos.csv", tol=1e-8, max_iter=100):
+def secantes_tabela(f, x0, x1, true_root, output_filename="secantes_saida.txt", tol=1e-6, max_iter=100):
     """
-    Executa o Método das Secantes e salva os passos em um arquivo CSV.
-
-    Args:
-        f (function): A função para a qual se busca a raiz.
-        x0 (float): Primeira aproximação inicial.
-        x1 (float): Segunda aproximação inicial.
-        true_root (float): O valor real da raiz para cálculo do erro.
-        output_filename (str): Nome do arquivo CSV de saída.
-        tol (float): Tolerância para a convergência.
-        max_iter (int): Número máximo de iterações.
+    Executa o Método das Secantes e salva os passos em um arquivo de texto formatado.
     """
-    with open(output_filename, 'w', newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(['k', 'xk', 'f(xk)', 'ek'])
+    fx0 = f(x0)
+    fx1 = f(x1)
 
-        # Escreve os pontos iniciais k=0 e k=1
-        fx0 = f(x0)
-        erro0 = abs(x0 - true_root)
-        writer.writerow([0, f'{x0:.8f}', f'{fx0:.8f}', f'{erro0:.8f}'])
+    try:
+        with open(output_filename, 'w') as file:
+            header = f"{'k':<5}{'xk':<20}{'f(xk)':<20}{'ek':<20}\n"
+            file.write(header)
+            file.write('-' * len(header) + '\n')
 
-        fx1 = f(x1)
-        erro1 = abs(x1 - true_root)
-        writer.writerow([1, f'{x1:.8f}', f'{fx1:.8f}', f'{erro1:.8f}'])
+            # Escreve os pontos iniciais k=0 e k=1
+            ek0 = abs(x0 - true_root)
+            file.write(f"{0:<5}{x0:<20.8f}{fx0:<20.8f}{ek0:<20.8f}\n")
+            ek1 = abs(x1 - true_root)
+            file.write(f"{1:<5}{x1:<20.8f}{fx1:<20.8f}{ek1:<20.8f}\n")
 
-        for k in range(2, max_iter + 2):
-            if fx1 - fx0 == 0:
-                print("Secantes: Divisão por zero.")
-                return {"raiz": None, "iteracoes": k, "convergiu": False}
+            for k in range(2, max_iter + 2):
+                if fx1 - fx0 == 0:
+                    print(f"Secantes ({output_filename}): Divisão por zero. O método falhou.")
+                    return
 
-            x2 = x1 - fx1 * (x1 - x0) / (fx1 - fx0)
-            fx2 = f(x2)
-            erro2 = abs(x2 - true_root)
+                xk_next = x1 - fx1 * (x1 - x0) / (fx1 - fx0)
+                fxk_next = f(xk_next)
+                ek_next = abs(xk_next - true_root)
 
-            writer.writerow([k, f'{x2:.8f}', f'{fx2:.8f}', f'{erro2:.8f}'])
+                file.write(f"{k:<5}{xk_next:<20.8f}{fxk_next:<20.8f}{ek_next:<20.8f}\n")
 
-            if abs(x2 - x1) < tol:
-                print(f"Secantes: Convergiu em {k} iterações (contando as iniciais).")
-                return {"raiz": x2, "iteracoes": k, "convergiu": True}
+                # Critério de parada (não usa 'ek')
+                if abs(xk_next - x1) < tol:
+                    print(f"Secantes ({output_filename}): Convergiu em {k} iterações.")
+                    return
 
-            x0, x1 = x1, x2
-            fx0, fx1 = fx1, fx2
+                x0, x1 = x1, xk_next
+                fx0, fx1 = fx1, fxk_next
 
-    print("Secantes: Número máximo de iterações atingido.")
-    return {"raiz": x1, "iteracoes": max_iter, "convergiu": False}
+        print(f"Secantes ({output_filename}): Atingiu o número máximo de iterações.")
 
-# --- Exemplo de Uso ---
-if __name__ == "__main__":
-    # f(x) = x^2 - 4
-    def minha_funcao(x):
-        return x**2 - 4
-
-    # A raiz verdadeira é 2.0
-    raiz_verdadeira = 2.0
-
-    # Parâmetros
-    x_inicial_0 = 1.0
-    x_inicial_1 = 3.0
-    tolerancia = 1e-8
-
-    print("\nExecutando o Método das Secantes e gerando a tabela...")
-    resultado = secantes_tabela(minha_funcao, x_inicial_0, x_inicial_1, raiz_verdadeira, tol=tolerancia)
-
-    if resultado["convergiu"]:
-        print(f"Raiz encontrada: {resultado['raiz']:.8f}")
-    print(f"Tabela de iterações salva em 'secantes_passos.csv'")
+    except IOError:
+        print(f"Secantes: Erro ao escrever no arquivo {output_filename}.")
