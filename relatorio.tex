@@ -72,6 +72,19 @@ e orquestrado por \texttt{main.py}. Entradas: função $f$, (e $f'$ para Newton)
 Saídas: arquivos \texttt{\{metodo\}\_saida1.txt} (para $[-2,-1]$) e \texttt{\{metodo\}\_saida2.txt} (para $[1,2]$), com colunas alinhadas
 e \emph{8 casas decimais} em dupla precisão.
 
+\subsection{Escolha das aproximações iniciais}
+A escolha dos valores iniciais em cada método foi guiada tanto pelas condições teóricas de convergência quanto por experimentação prática:
+
+\begin{itemize}
+    \item \textbf{Bisseção:} os extremos dos intervalos $[a,b]$ foram fixados conforme o enunciado, bastando verificar que $f(a)f(b)<0$ para garantir a existência de uma raiz e a convergência do método.
+
+    \item \textbf{Newton--Raphson:} em $[1,2]$, escolheu-se $x_0=2$, pois além de estar próximo da raiz $\sqrt{3}$, satisfaz $f(x_0)f''(x_0)>0$, condição suficiente para convergência local. Já em $[-2,-1]$, como $f'$ e $f''$ mudam de sinal dentro do intervalo, as condições globais não se verificam; por isso, adotou-se $x_0=-1{,}5$ de forma empírica, garantindo convergência para a raiz $-\sqrt{3}$.
+
+    \item \textbf{Secantes:} os dois valores iniciais foram simplesmente os extremos do intervalo, $x_0=a$ e $x_1=b$. Essa escolha é natural, pois costuma cercar a raiz e evita arbitrariedade, ao mesmo tempo em que dispensa o cálculo da derivada.
+\end{itemize}
+
+Assim, cada escolha inicial foi fundamentada em critérios teóricos quando possível (Bisseção e Newton em $[1,2]$) ou em testes práticos seguros (Newton em $[-2,-1]$), sempre preservando a robustez do processo de aproximação.
+
 \textbf{Dificuldades e soluções práticas} (documentadas no código):
 (i) \emph{Derivada nula} em Newton: caso $f'(x_k)=0$, interrompe-se com mensagem de falha (evita divisão por zero);
 (ii) \emph{Secantes:} checa-se $f(x_k)-f(x_{k-1})\neq 0$ para evitar divisão por zero; 
