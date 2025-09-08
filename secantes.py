@@ -1,11 +1,9 @@
-# Autores: Nome Completo do Autor 1, N° USP: 00000000
-#          Nome Completo do Autor 2, N° USP: 00000000
-#          Nome Completo do Autor 3, N° USP: 00000000
+# Autores: FABIO KAUÊ ARAUJO DA SILVA, N° USP: 16311045
+#          PEDRO ANHIEVISK, N° USP: 00000000
+
+from arredondamento import arredondar_especial
 
 def secantes_tabela(f, x0, x1, true_root, output_filename="secantes_saida.txt", tol=1e-6, max_iter=100):
-    """
-    Executa o Método das Secantes e salva os passos em um arquivo de texto formatado.
-    """
     fx0 = f(x0)
     fx1 = f(x1)
 
@@ -17,9 +15,9 @@ def secantes_tabela(f, x0, x1, true_root, output_filename="secantes_saida.txt", 
 
             # Escreve os pontos iniciais k=0 e k=1
             ek0 = abs(x0 - true_root)
-            file.write(f"{0:<5}{x0:<20.8f}{fx0:<20.8f}{ek0:<20.8f}\n")
+            file.write(f"{0:<5}{arredondar_especial(x0, 8):<20.8f}{arredondar_especial(fx0, 8):<20.8f}{arredondar_especial(ek0, 8):<20.8f}\n")
             ek1 = abs(x1 - true_root)
-            file.write(f"{1:<5}{x1:<20.8f}{fx1:<20.8f}{ek1:<20.8f}\n")
+            file.write(f"{1:<5}{arredondar_especial(x1, 8):<20.8f}{arredondar_especial(fx1, 8):<20.8f}{arredondar_especial(ek1, 8):<20.8f}\n")
 
             for k in range(2, max_iter + 2):
                 if fx1 - fx0 == 0:
@@ -30,9 +28,13 @@ def secantes_tabela(f, x0, x1, true_root, output_filename="secantes_saida.txt", 
                 fxk_next = f(xk_next)
                 ek_next = abs(xk_next - true_root)
 
-                file.write(f"{k:<5}{xk_next:<20.8f}{fxk_next:<20.8f}{ek_next:<20.8f}\n")
+                # Arredonda os valores
+                xk_next_r = arredondar_especial(xk_next, 8)
+                fxk_next_r = arredondar_especial(fxk_next, 8)
+                ek_next_r = arredondar_especial(ek_next, 8)
 
-                # Critério de parada (não usa 'ek')
+                file.write(f"{k:<5}{xk_next_r:<20.8f}{fxk_next_r:<20.8f}{ek_next_r:<20.8f}\n")
+
                 if abs(xk_next - x1) < tol:
                     print(f"Secantes ({output_filename}): Convergiu em {k} iterações.")
                     return

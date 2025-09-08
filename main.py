@@ -1,6 +1,5 @@
-# Autores: Nome Completo do Autor 1, N° USP: 00000000
-#          Nome Completo do Autor 2, N° USP: 00000000
-#          Nome Completo do Autor 3, N° USP: 00000000
+# Autores: FABIO KAUÊ ARAUJO DA SILVA, N° USP: 16311045
+#          PEDRO ANHIEVISK, N° USP: 00000000
 
 import math
 from bissecao import bissecao_tabela
@@ -30,20 +29,14 @@ print("Iniciando a execução dos métodos numéricos...")
 
 # --- Execução para a Raiz 1 (Intervalo [-2, -1]) ---
 print("\n--- Calculando a raiz no intervalo [-2, -1] ---")
-# Bisseção
 bissecao_tabela(f, a=-2.0, b=-1.0, true_root=raiz_exata_1, output_filename="bissecao_saida1.txt", tol=TOLERANCIA, max_iter=MAX_ITER)
-# Newton
 newton_tabela(f, f_prime, x0=-1.5, true_root=raiz_exata_1, output_filename="newton_saida1.txt", tol=TOLERANCIA, max_iter=MAX_ITER)
-# Secantes
 secantes_tabela(f, x0=-2.0, x1=-1.0, true_root=raiz_exata_1, output_filename="secantes_saida1.txt", tol=TOLERANCIA, max_iter=MAX_ITER)
 
 # --- Execução para a Raiz 2 (Intervalo [1, 2]) ---
 print("\n--- Calculando a raiz no intervalo [1, 2] ---")
-# Bisseção
 bissecao_tabela(f, a=1.0, b=2.0, true_root=raiz_exata_2, output_filename="bissecao_saida2.txt", tol=TOLERANCIA, max_iter=MAX_ITER)
-# Newton
 newton_tabela(f, f_prime, x0=2.0, true_root=raiz_exata_2, output_filename="newton_saida2.txt", tol=TOLERANCIA, max_iter=MAX_ITER)
-# Secantes
 secantes_tabela(f, x0=1.0, x1=2.0, true_root=raiz_exata_2, output_filename="secantes_saida2.txt", tol=TOLERANCIA, max_iter=MAX_ITER)
 
 print("\nExecução concluída. Arquivos de saída foram gerados.")
