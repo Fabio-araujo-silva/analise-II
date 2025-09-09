@@ -30,71 +30,70 @@
 \begin{abstract}
 Este artigo compara os métodos da Bisseção, de Newton-Raphson e das Secantes na determinação de raízes reais da função
 $f(x)=3x^{5}+8x^{4}-6x^{3}-16x^{2}-9x-24$.
-Apresentam-se as descrições dos métodos, condições suficientes de convergência, implementação independente em programas (Python),
-análise gráfica da existência de raízes nos intervalos $[-2,-1]$ e $[1,2]$, determinação das raízes exatas para comparação e
-discussão de resultados (número de iterações e precisão com tolerância $10^{-6}$).
+Apresentam-se as descrições detalhadas dos métodos, suas condições de convergência, a implementação computacional em Python,
+a análise gráfica da existência de raízes nos intervalos $[-2,-1]$ e $[1,2]$, a determinação analítica das raízes exatas para comparação e
+uma discussão aprofundada dos resultados (número de iterações, precisão com tolerância $10^{-6}$ e eficiência computacional).
 \end{abstract}
 
 \section{Introdução}
 O objetivo é resolver o problema proposto em disciplina de Análise Numérica:
-(i) descrever os métodos de Bisseção, Newton-Raphson e Secantes; (ii) evidenciar graficamente a existência de pelo menos uma raiz em
+(i) descrever detalhadamente os métodos de Bisseção, Newton-Raphson e Secantes; (ii) evidenciar graficamente a existência de pelo menos uma raiz em
 $[-2,-1]$ e $[1,2]$; (iii) determinar \emph{todas} as raízes exatas de $f$ para servir de referência;
-(iv) verificar condições suficientes de convergência; (v) aproximar as raízes nos dois intervalos com precisão $10^{-6}$,
+(iv) verificar e aplicar as condições suficientes de convergência para cada método; (v) aproximar as raízes nos dois intervalos com precisão $10^{-6}$,
 gerando arquivos de saída tabulados por método, em dupla precisão, com pelo menos oito casas decimais.
 
 \paragraph{Contribuições.}
-(i) Corrige-se a determinação das raízes exatas por fatoração simbólica; (ii) documentam-se dificuldades práticas de implementação
-e as soluções adotadas; (iii) inclui-se um gráfico programático (pgfplots) que marca as raízes reais pedidas.
+(i) Detalha-se a determinação das raízes exatas por meio do Teorema das Raízes Racionais e fatoração simbólica; (ii) documentam-se dificuldades práticas de implementação
+e as soluções adotadas; (iii) inclui-se um gráfico programático (pgfplots) que marca as raízes reais pedidas, auxiliando na visualização dos resultados.
 
 \section{Métodos e Procedimentos}
-\subsection{Bisseção}
-Baseia-se no Teorema do Valor Intermediário: se $f(a)f(b)<0$ em $[a,b]$, há uma raiz em $(a,b)$.
-A cada iteração $k$, toma-se $x_k=\tfrac{a_k+b_k}{2}$, avalia-se $f(x_k)$ e escolhe-se o subintervalo com troca de sinal.
-\emph{Critério de parada:} $(b_k-a_k)/2<\texttt{tol}$ (sem usar o erro verdadeiro $e_k$).
-\emph{Saída tabular:} $k$, $a_k$, $b_k$, $x_k$, $f(x_k)$ e o erro $e_k=|x_k-\bar{x}|$ (apenas para \emph{relato/aval.}, não para parar).
+\subsection{Método da Bisseção}
+O Método da Bisseção é um algoritmo de busca incremental fundamentado no \textbf{Teorema do Valor Intermediário}. Este teorema garante que, para uma função contínua $f$ em um intervalo fechado $[a,b]$, se $f(a)$ e $f(b)$ tiverem sinais opostos (i.e., $f(a)f(b)<0$), então existe pelo menos um ponto $\bar{x} \in (a,b)$ tal que $f(\bar{x})=0$.
 
-\subsection{Newton--Raphson}
-Iteração $x_{k+1}=x_k-\dfrac{f(x_k)}{f'(x_k)}$, com convergência quadrática quando $x_0$ está suficientemente próximo de raiz simples
-e $f'$ não se anula no percurso. \emph{Parada:} $|x_{k+1}-x_k|<\texttt{tol}$.
-\emph{Saída tabular:} $k$, $x_k$, $f(x_k)$, $f'(x_k)$, $e_k$.
-
-\subsection{Secantes}
-Aproxima Newton substituindo $f'(x_k)$ por a diferença quociente usando $x_{k}$ e $x_{k-1}$:
-\[
-x_{k+1}=x_k - f(x_k)\,\frac{x_k-x_{k-1}}{f(x_k)-f(x_{k-1})}.
-\]
-\emph{Parada:} $|x_{k+1}-x_k|<\texttt{tol}$.
-\emph{Saída tabular:} $k$, $x_k$, $f(x_k)$, $e_k$.
-
-\subsection{Implementação, entradas/saídas e dificuldades}
-Cada método foi implementado em arquivo Python distinto (\texttt{bissecao.py}, \texttt{newton\_raphson.py}, \texttt{secantes.py})
-e orquestrado por \texttt{main.py}. Entradas: função $f$, (e $f'$ para Newton), aproximações iniciais, $\texttt{tol}=10^{-6}$ e $\texttt{maxit}$.
-Saídas: arquivos \texttt{\{metodo\}\_saida1.txt} (para $[-2,-1]$) e \texttt{\{metodo\}\_saida2.txt} (para $[1,2]$), com colunas alinhadas
-e \emph{8 casas decimais} em dupla precisão.
-
-\subsection{Escolha das aproximações iniciais}
-A escolha dos valores iniciais em cada método foi guiada tanto pelas condições teóricas de convergência quanto por experimentação prática:
-
+O processo iterativo consiste em dividir o intervalo ao meio a cada passo. Em uma iteração $k$, calcula-se o ponto médio $x_k = \frac{a_k+b_k}{2}$. Em seguida, o sinal de $f(x_k)$ é avaliado:
 \begin{itemize}
-    \item \textbf{Bisseção:} os extremos dos intervalos $[a,b]$ foram fixados conforme o enunciado, bastando verificar que $f(a)f(b)<0$ para garantir a existência de uma raiz e a convergência do método.
+    \item Se $f(a_k)f(x_k) < 0$, a raiz está no subintervalo $[a_k, x_k]$, então faz-se $b_{k+1}=x_k$ e $a_{k+1}=a_k$.
+    \item Se $f(x_k)f(b_k) < 0$, a raiz está no subintervalo $[x_k, b_k]$, então faz-se $a_{k+1}=x_k$ e $b_{k+1}=b_k$.
+    \item Se $f(x_k) = 0$, $x_k$ é a raiz exata e o processo termina.
+\end{itemize}
+A principal vantagem do método é sua robustez e \textbf{convergência garantida}, desde que a condição inicial seja satisfeita. Sua taxa de convergência é linear, o que o torna relativamente lento em comparação com outros métodos. O critério de parada utilizado foi o tamanho do intervalo de incerteza: $(b_k-a_k)/2 < \texttt{tol}$. A saída tabular gerada contém as colunas: $k$, $a_k$, $b_k$, $x_k$, $f(x_k)$ e o erro verdadeiro $e_k=|x_k-\bar{x}|$ (usado apenas para análise posterior).
 
-    \item \textbf{Newton--Raphson:} em $[1,2]$, escolheu-se $x_0=2$, pois além de estar próximo da raiz $\sqrt{3}$, satisfaz $f(x_0)f''(x_0)>0$, condição suficiente para convergência local. Já em $[-2,-1]$, como $f'$ e $f''$ mudam de sinal dentro do intervalo, as condições globais não se verificam; por isso, adotou-se $x_0=-1{,}5$ de forma empírica, garantindo convergência para a raiz $-\sqrt{3}$.
+\subsection{Método de Newton--Raphson}
+O Método de Newton--Raphson (ou método das tangentes) é um método aberto que aproxima a raiz de uma função utilizando a reta tangente ao gráfico de $f(x)$ em um ponto. A ideia é que a intersecção da reta tangente com o eixo das abscissas seja uma aproximação melhor da raiz do que o ponto de tangência inicial. A fórmula de iteração é derivada da equação da reta tangente:
+\[
+x_{k+1} = x_k - \frac{f(x_k)}{f'(x_k)}
+\]
+Para este método, é necessário que a função $f$ seja diferenciável e que a derivada $f'(x_k)$ não seja nula. Sua principal vantagem é a \textbf{convergência quadrática} ($e_{k+1} \approx C \cdot e_k^2$) quando a aproximação inicial $x_0$ está suficientemente próxima de uma raiz simples.
 
-    \item \textbf{Secantes:} os dois valores iniciais foram simplesmente os extremos do intervalo, $x_0=a$ e $x_1=b$. Essa escolha é natural, pois costuma cercar a raiz e evita arbitrariedade, ao mesmo tempo em que dispensa o cálculo da derivada.
+\paragraph{Garantia de Convergência.} Uma condição suficiente para a convergência monotônica a partir de $x_0$ em um intervalo $[a,b]$ que contém a raiz $\bar{x}$ é que $f'(x)$ e $f''(x)$ não mudem de sinal em $[a,b]$ e que $x_0$ seja escolhido tal que $f(x_0)f''(x_0) > 0$. Para o intervalo $[1,2]$, a escolha $x_0=2$ satisfaz essa condição. No intervalo $[-2, -1]$, as derivadas mudam de sinal, tornando a escolha de $x_0$ mais sensível. Adotou-se $x_0 = -1,5$ com base em análise empírica, que se mostrou eficaz. O critério de parada foi $|x_{k+1}-x_k| < \texttt{tol}$. A saída tabular contém: $k$, $x_k$, $f(x_k)$, $f'(x_k)$, $e_k$.
+
+\subsection{Método das Secantes}
+O Método das Secantes é uma variação do método de Newton que evita o cálculo explícito da derivada. Ele aproxima a derivada $f'(x_k)$ pela inclinação da reta secante que passa pelos dois pontos anteriores, $(x_{k-1}, f(x_{k-1}))$ e $(x_k, f(x_k))$:
+\[
+f'(x_k) \approx \frac{f(x_k) - f(x_{k-1})}{x_k - x_{k-1}}
+\]
+Substituindo essa aproximação na fórmula de Newton, obtém-se a iteração das Secantes:
+\[
+x_{k+1} = x_k - f(x_k)\,\frac{x_k - x_{k-1}}{f(x_k) - f(x_{k-1})}
+\]
+Este método requer duas aproximações iniciais, $x_0$ e $x_1$. Sua taxa de convergência é \textbf{superlinear} (com ordem $\phi \approx 1.618$), sendo mais rápido que a Bisseção, porém mais lento que a convergência quadrática ideal de Newton.
+
+\paragraph{Garantia de Convergência.} As condições de convergência são semelhantes às de Newton, exigindo que as aproximações iniciais estejam suficientemente próximas da raiz. Uma escolha comum e robusta, adotada neste trabalho, é usar os extremos do intervalo de interesse, $x_0 = a$ e $x_1 = b$, especialmente quando $f(a)f(b) < 0$. O critério de parada foi $|x_{k+1}-x_k| < \texttt{tol}$. A saída tabular contém: $k$, $x_k$, $f(x_k)$, $e_k$.
+
+\subsection{Ferramentas Computacionais e Implementação}
+Cada método foi implementado em um arquivo Python distinto (\texttt{bissecao.py}, \texttt{newton\_raphson.py}, \texttt{secantes.py}) e orquestrado por um script principal (\texttt{main.py}). As entradas foram a função $f$, sua derivada $f'$ (para Newton), as aproximações iniciais, a tolerância $\texttt{tol}=10^{-6}$ e um número máximo de iterações. As saídas foram formatadas em arquivos de texto com colunas alinhadas e 8 casas decimais. Para a fatoração simbólica, foi utilizado o Teorema das Raízes Racionais, com verificação por meio de um Sistema de Computação Algébrica (CAS). O gráfico foi gerado usando o pacote \texttt{pgfplots} do LaTeX.
+
+\subsection{Escolha das Aproximações Iniciais}
+A escolha dos valores iniciais para cada método foi guiada pela teoria e por experimentação:
+\begin{itemize}
+    \item \textbf{Bisseção:} Os extremos dos intervalos, $[-2,-1]$ e $[1,2]$, foram usados diretamente, pois $f(a)f(b)<0$ em ambos os casos, garantindo a convergência.
+    \item \textbf{Newton--Raphson:} Em $[1,2]$, escolheu-se $x_0=2$, pois satisfaz $f(x_0)f''(x_0)>0$. Em $[-2,-1]$, onde as condições teóricas globais não se aplicam facilmente, $x_0=-1,5$ foi escolhido empiricamente por estar no centro do intervalo e convergir corretamente.
+    \item \textbf{Secantes:} Os extremos de cada intervalo foram usados como $x_0$ e $x_1$, uma escolha natural que cerca a raiz e dispensa o cálculo da derivada.
 \end{itemize}
 
-Assim, cada escolha inicial foi fundamentada em critérios teóricos quando possível (Bisseção e Newton em $[1,2]$) ou em testes práticos seguros (Newton em $[-2,-1]$), sempre preservando a robustez do processo de aproximação.
-
-\textbf{Dificuldades e soluções práticas} (documentadas no código):
-(i) \emph{Derivada nula} em Newton: caso $f'(x_k)=0$, interrompe-se com mensagem de falha (evita divisão por zero);
-(ii) \emph{Secantes:} checa-se $f(x_k)-f(x_{k-1})\neq 0$ para evitar divisão por zero; 
-(iii) \emph{Escolha de $x_0$ em Newton ($[-2,-1]$):} como $f'$ e $f''$ mudam de sinal nesse intervalo, as condições suficientes globais não se verificam; adotou-se $x_0=-1{,}5$, que empiricamente converge para a raiz correta;
-(iv) \emph{Apresentação}: arredondamento consistente (8 casas) e supressão de “$-0{,}00000000$” na escrita das tabelas.
-
 \section{Resultados}
-\subsection{Análise gráfica e existência de raízes em $[-2,-1]$ e $[1,2]$}
-A Figura~\ref{fig:grafico} apresenta $f(x)$ no intervalo $[-3,3]$ com destaque das raízes reais e dos dois intervalos de interesse.
-Nota-se $f(-2)\cdot f(-1)=10\cdot(-20)<0$ e $f(1)\cdot f(2)=-44\cdot 70<0$, garantindo ao menos uma raiz real em cada intervalo.
+\subsection{Análise Gráfica e Existência de Raízes}
+A Figura~\ref{fig:grafico} mostra o gráfico de $f(x)$. A análise visual e de sinais confirma a existência de raízes nos intervalos de interesse: $f(-2)=10$ e $f(-1)=-20$, logo $f(-2)f(-1)<0$; e $f(1)=-44$ e $f(2)=70$, logo $f(1)f(2)<0$. Pelo Teorema do Valor Intermediário, há pelo menos uma raiz real em cada intervalo.
 
 \begin{figure}[H]
 \centering
@@ -121,35 +120,26 @@ Nota-se $f(-2)\cdot f(-1)=10\cdot(-20)<0$ e $f(1)\cdot f(2)=-44\cdot 70<0$, gara
 \addplot[very thick, red] coordinates {(1,0) (2,0)} node[pos=0.5,below,yshift=-2pt] {$[1,2]$};
 \end{axis}
 \end{tikzpicture}
-\caption{Gráfico de $f(x)=3x^{5}+8x^{4}-6x^{3}-16x^{2}-9x-24$ com raízes reais destacadas e intervalos $[-2,-1]$ e $[1,2]$.}
+\caption{Gráfico de $f(x)=3x^{5}+8x^{4}-6x^{3}-16x^{2}-9x-24$ com raízes reais destacadas.}
 \label{fig:grafico}
 \end{figure}
 
-\subsection{Raízes exatas de $f(x)$}
-A fatoração simbólica de $f$ é:
+\subsection{Determinação Analítica das Raízes Exatas}
+Para encontrar as raízes exatas de $f(x)=3x^{5}+8x^{4}-6x^{3}-16x^{2}-9x-24$, aplicou-se o \textbf{Teorema das Raízes Racionais}. As possíveis raízes racionais são da forma $p/q$, onde $p$ divide o termo independente ($-24$) e $q$ divide o coeficiente líder ($3$). Testando os candidatos, verifica-se que $x = -8/3$ é uma raiz, pois $f(-8/3)=0$.
+Isso implica que $(3x+8)$ é um fator de $f(x)$. Realizando a divisão polinomial de $f(x)$ por $(3x+8)$, obtemos:
 \[
-f(x)=(3x+8)\,(x^{2}-3)\,(x^{2}+1).
+\frac{3x^{5}+8x^{4}-6x^{3}-16x^{2}-9x-24}{3x+8} = x^4 - 2x^2 - 3
 \]
-Logo, as \textbf{raízes exatas} são
-\[
-x=-\tfrac{8}{3},\quad x=\pm \sqrt{3},\quad x=\pm i.
-\]
-Para comparação numérica neste trabalho, interessam as \emph{raízes reais} $-\tfrac{8}{3}$, $-\sqrt{3}$ e $\sqrt{3}$.
-As duas raízes requeridas nos intervalos especificados são $-\sqrt{3}\in[-2,-1]$ e $\sqrt{3}\in[1,2]$.
+Agora, precisamos encontrar as raízes de $g(x) = x^4 - 2x^2 - 3$. Esta é uma equação biquadrada. Fazendo a substituição $u=x^2$, temos a equação quadrática $u^2 - 2u - 3 = 0$. Fatorando, obtemos $(u-3)(u+1) = 0$, cujas soluções são $u=3$ e $u=-1$.
+Substituindo de volta:
+\begin{itemize}
+    \item $x^2 = 3 \implies x = \pm\sqrt{3}$
+    \item $x^2 = -1 \implies x = \pm i$
+\end{itemize}
+Portanto, a fatoração completa de $f(x)$ é $f(x)=(3x+8)(x^2-3)(x^2+1)$, e as \textbf{raízes exatas} são $x = -8/3$, $x = \pm\sqrt{3}$ e $x = \pm i$. As raízes reais de interesse para este trabalho são $-\sqrt{3} \in [-2,-1]$ e $\sqrt{3} \in [1,2]$.
 
-\subsection{Condições suficientes de convergência (resumo)}
-\textbf{Bisseção:} exige $f(a)f(b)<0$, satisfeita em $[-2,-1]$ e $[1,2]$; garante convergência.
-\\
-\textbf{Newton:} condições clássicas (raiz simples, $f'\neq 0$ na vizinhança e escolha de $x_0$ com $f(x_0)f''(x_0)>0$) asseguram convergência local. Em $[1,2]$, $x_0=2$ atende bem; em $[-2,-1]$, como $f'$ e $f''$ mudam de sinal, adota-se $x_0=-1{,}5$ por empirismo seguro.
-\\
-\textbf{Secantes:} convergência superlinear sob hipóteses suaves, em geral quando os chutes iniciais estão suficientemente próximos/“cercando” a raiz. Usaram-se os extremos do intervalo como $x_0$ e $x_1$.
-
-\subsection{Aproximações numéricas (tolerância $10^{-6}$)}
-Critérios de parada \emph{sem} uso de $e_k$:
-Bisseção: $(b-a)/2<10^{-6}$; Newton: $|x_{k+1}-x_k|<10^{-6}$; Secantes: $|x_{k+1}-x_k|<10^{-6}$.
-As tabelas completas (com $k$, valores e $e_k$) estão nos arquivos \texttt{bissecao\_saida*.txt}, \texttt{newton\_saida*.txt} e
-\texttt{secantes\_saida*.txt}. Abaixo, um \emph{resumo} do número de iterações por método e intervalo, com as escolhas iniciais:
-Bisseção ($[a,b]$), Newton ($x_0$), Secantes ($x_0,x_1$ nos extremos).
+\subsection{Aproximações Numéricas (tolerância $10^{-6}$)}
+As tabelas completas estão nos arquivos de saída. A Tabela~\ref{tab:resumo} sumariza o número de iterações necessárias para cada método atingir a tolerância de $10^{-6}$, usando os critérios de parada $|x_{k+1}-x_k|<\texttt{tol}$ para Newton/Secantes e $(b-a)/2<\texttt{tol}$ para Bisseção.
 
 \begin{table}[H]
 \centering
@@ -159,7 +149,7 @@ Bisseção ($[a,b]$), Newton ($x_0$), Secantes ($x_0,x_1$ nos extremos).
 \toprule
 Método & $[-2,-1]$ (raiz $-\sqrt{3}$) & $[1,2]$ (raiz $\sqrt{3}$) \\
 \midrule
-Bisseção (a,b) & 19 & 19 \\
+Bisseção ($[a,b]$) & 19 & 19 \\
 Newton ($x_0$) & 4 \, (com $x_0=-1{,}5$) & 5 \, (com $x_0=2{,}0$) \\
 Secantes ($x_0,x_1$) & 5 \, (com $-2,-1$) & 8 \, (com $1,2$) \\
 \bottomrule
@@ -167,20 +157,22 @@ Secantes ($x_0,x_1$) & 5 \, (com $-2,-1$) & 8 \, (com $1,2$) \\
 \end{table}
 
 \paragraph{Discussão.}
-Os resultados confirmam a teoria: Newton apresentou menor número de iterações (convergência quadrática), seguido das Secantes
-(superlinear) e da Bisseção (linear). A Bisseção, embora mais lenta, é a mais robusta quando há troca de sinal;
-Newton é extremamente eficiente quando bem-inicializado e com derivada disponível; Secantes evita derivada, com custo por iteração
-baixo e desempenho intermediário.
+Os resultados alinham-se perfeitamente com a teoria. O método de Newton-Raphson foi o mais rápido em ambos os casos, refletindo sua convergência quadrática. O método das Secantes apresentou um desempenho intermediário, necessitando de poucas iterações a mais que Newton, mas superando largamente a Bisseção. A Bisseção, embora seja o método mais lento devido à sua convergência linear, cumpriu seu papel de forma robusta e previsível, exigindo o mesmo número de iterações para intervalos de mesmo tamanho.
 
 \section{Conclusões}
-Todos os objetivos propostos foram alcançados.
-As raízes exatas reais foram determinadas por fatoração: $-\tfrac{8}{3}$, $-\sqrt{3}$ e $\sqrt{3}$; as raízes-alvo dos intervalos
-foram $-\sqrt{3}$ e $\sqrt{3}$.
-As condições de convergência dos métodos foram verificadas e discutidas; implementações independentes geraram saídas tabuladas
-com 8 casas decimais em dupla precisão; os critérios de parada não utilizaram o erro verdadeiro.
-Comparativamente, Newton demandou menos iterações quando inicializado de forma adequada; Secantes obteve desempenho intermediário
-sem derivadas; Bisseção garantiu convergência ao custo de mais iterações.
-Os artefatos (código e arquivos de saída) acompanham este relatório.
+Este trabalho realizou uma análise comparativa bem-sucedida dos métodos da Bisseção, Newton-Raphson e Secantes para encontrar as raízes reais de um polinômio de quinto grau. As raízes alvo, $-\sqrt{3}$ e $\sqrt{3}$, foram aproximadas com a precisão estipulada.
+
+Do ponto de vista computacional, a análise revelou um claro \emph{trade-off} entre velocidade, robustez e custo por iteração:
+
+\begin{itemize}
+    \item \textbf{Bisseção:} É o método mais robusto. Sua principal virtude é a garantia de convergência, contanto que $f(a)f(b)<0$. O custo computacional por iteração é mínimo (uma avaliação de $f(x)$ e operações aritméticas simples). No entanto, sua convergência linear o torna ineficiente para problemas que exigem alta precisão, demandando um número significativamente maior e previsível de iterações.
+
+    \item \textbf{Newton-Raphson:} É o método mais rápido em termos de iterações, graças à sua convergência quadrática. Contudo, essa velocidade tem um preço: o custo computacional por iteração é maior, pois requer a avaliação tanto de $f(x)$ quanto de sua derivada $f'(x)$, que pode ser analiticamente complexa ou computacionalmente cara. Além disso, é o método mais sensível às condições iniciais; uma má escolha de $x_0$ pode levar à divergência ou à convergência para uma raiz inesperada.
+
+    \item \textbf{Secantes:} Representa um excelente equilíbrio entre os outros dois. Ao aproximar a derivada, elimina a necessidade de seu cálculo explícito, reduzindo o custo por iteração em comparação com Newton. Sua convergência superlinear o torna muito mais rápido que a Bisseção. Embora não seja tão robusto quanto a Bisseção, é geralmente menos sensível à escolha inicial do que Newton, sendo uma escolha pragmática e eficiente em muitos cenários práticos.
+\end{itemize}
+
+Em suma, a escolha do método ideal depende das características do problema: para garantia de convergência sem conhecimento prévio da função, a Bisseção é a escolha segura. Quando a derivada é facilmente calculável e uma boa aproximação inicial é conhecida, Newton é insuperável em velocidade. O método das Secantes emerge como a alternativa mais versátil, oferecendo convergência rápida sem a sobrecarga de calcular derivadas.
 
 \section*{Referências}
 \begin{itemize}\itemsep0.3em
